@@ -4,19 +4,27 @@ from src.trainer.predict import predict, train_epoch
 from src.trainer.eval import eval
 from tqdm.auto import tqdm
 import pandas as pd
+import torch
+import os
 
 
 def train(
-    model,
-    train_dataloader,
-    optimizer,
-    epochs,
-    val_dataloader,
-    test_dataloader,
-    labels,
-    problem_type,
-    log_wandb,
+        model,
+        model_name,
+        dataset_name,
+        train_dataloader,
+        optimizer,
+        epochs,
+        val_dataloader,
+        test_dataloader,
+        labels,
+        problem_type,
+        log_wandb,
+        checkpoint_path="model_checkpoints"
 ):
+    # Ensure the checkpoint directory exists
+    os.makedirs(checkpoint_path, exist_ok=True)
+
     tq = tqdm(range(epochs))
 
     for epoch in tq:
@@ -30,21 +38,20 @@ def train(
 
         report_dict = calculate_metrics(val_y_true, val_y_pred, labels, problem_type)
 
-        if log_wandb:
-            wandb_dict = report_dict.copy()
-            for label in labels.values():
-                wandb_dict.pop(label)
-            wandb_dict.pop("samples avg", None)
-            wandb_dict.pop("weighted avg", None)
-            for key in wandb_dict:
-                if isinstance(wandb_dict[key], dict):
-                    wandb_dict[key].pop("support", None)
-            wandb.log({"train_loss": train_loss, "val_loss": val_loss, **wandb_dict})
-
         tq.set_description(f"train_loss: {train_loss:.4f}, val_loss: {val_loss:.4f}")
 
+        # Create a descriptive filename for the checkpoint
+        descriptive_filename = f"{model_name}_{dataset_name}_epoch_{epoch + 1}_val_loss_{val_loss:.4f}.pt"
+        checkpoint_filename = os.path.join(checkpoint_path, descriptive_filename)
+        torch.save({
+            'epoch': epoch + 1,
+            'model_state_dict': model.state_dict(),
+            'optimizer_state_dict': optimizer.state_dict(),
+            'val_loss': val_loss,
+            'report_dict': report_dict
+        }, checkpoint_filename)
+
+    # Evaluate the model after all epochs are completed
     df = eval(model, test_dataloader, labels, problem_type)
 
-    if log_wandb:
-        table = wandb.Table(dataframe=df.rename_axis("metric").reset_index())
-        wandb.log({"table": table})
+    return df

@@ -1,5 +1,5 @@
 max_length: null
-batch_size: 64
+batch_size: 32
 shuffle: True
 num_workers: 2
 pin_memory: False

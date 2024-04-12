@@ -46,6 +46,8 @@ def main(cfg: DictConfig):
 
         train(
             model=model,
+            model_name=cfg.model.name,
+            dataset_name=cfg.dataset.name,
             train_dataloader=train_dataloader,
             optimizer=optimizer,
             epochs=cfg.trainer.num_epochs,
@@ -59,15 +61,11 @@ def main(cfg: DictConfig):
         if cfg.log_wandb:
             wandb.finish()
 
-        ask = input("Upload to hub?: ")
-        if ask == "y" or ask == "yes":
-            save_model(
-                model,
-                tokenizer,
-                f"models/{cfg.model.name}-{cfg.dataset.name}-ep={cfg.trainer.num_epochs}-lr={cfg.trainer.lr}",
-            )
-
-            push_to_hub(model, tokenizer, f"{cfg.model.name}-{cfg.dataset.name}")
+        save_model(
+            model,
+            tokenizer,
+            f"models/{cfg.model.name}-{cfg.dataset.name}-ep={cfg.trainer.num_epochs}-lr={cfg.trainer.lr}",
+        )
 
     elif cfg.task == "eval":
         tokenizer, model = get_model(

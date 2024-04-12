@@ -131,3 +131,6 @@ dmypy.json
 models/
 outputs/
 wandb/
+
+# Ignore model checkpoints
+model_checkpoints/
