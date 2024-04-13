@@ -7,6 +7,9 @@ import hydra
 from omegaconf import DictConfig, OmegaConf
 from hydra.utils import instantiate, call
 from src.utils.utils import save_model, push_to_hub
+import random
+import numpy as np
+import torch
 
 # turn off bert warnings
 os.environ["TRANSFORMERS_NO_ADVISORY_WARNINGS"] = "true"
@@ -19,9 +22,17 @@ os.environ["HYDRA_FULL_ERROR"] = "1"
 # wandb.login()
 # notebook_login()
 
+def set_seed(seed=42):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
 
 @hydra.main(version_base=None, config_path="conf", config_name="config")
 def main(cfg: DictConfig):
+    set_seed(42)
+
     if cfg.task == "train":
         tokenizer, model = get_model(
             cfg.model.encoder,
@@ -46,6 +57,7 @@ def main(cfg: DictConfig):
 
         train(
             model=model,
+            tokenizer=tokenizer,
             model_name=cfg.model.name,
             dataset_name=cfg.dataset.name,
             train_dataloader=train_dataloader,
@@ -58,14 +70,14 @@ def main(cfg: DictConfig):
             log_wandb=cfg.log_wandb,
         )
 
-        if cfg.log_wandb:
-            wandb.finish()
+        # if cfg.log_wandb:
+        #     wandb.finish()
 
-        save_model(
-            model,
-            tokenizer,
-            f"models/{cfg.model.name}-{cfg.dataset.name}-ep={cfg.trainer.num_epochs}-lr={cfg.trainer.lr}",
-        )
+        # save_model(
+        #     model,
+        #     tokenizer,
+        #     f"models/{cfg.model.name}-{cfg.dataset.name}-ep={cfg.trainer.num_epochs}-lr={cfg.trainer.lr}",
+        # )
 
     elif cfg.task == "eval":
         tokenizer, model = get_model(
