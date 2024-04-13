@@ -1,0 +1,19 @@
+name: lv-go-emotions-ekman
+num_labels: 7
+labels:
+  0: anger
+  1: disgust
+  2: fear
+  3: joy
+  4: sadness
+  5: surprise
+  6: neutral
+
+dataloader:
+  _target_: src.data.lv_go_emotions_ekman.get_dataloaders
+  max_length: ${trainer.max_length}
+  batch_size: ${trainer.batch_size}
+  shuffle: ${trainer.shuffle}
+  num_workers: ${trainer.num_workers}
+  pin_memory: ${trainer.pin_memory}
+  drop_last: ${trainer.drop_last}
