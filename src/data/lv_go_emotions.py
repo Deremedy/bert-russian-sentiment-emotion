@@ -9,7 +9,7 @@ def preprocess(tokenizer, max_length):
     dataset = load_dataset("SkyWater21/lv_go_emotions", "simplified")
 
     processed_dataset = dataset.map(
-        lambda x: tokenizer(x["text"], truncation=True, max_length=max_length),
+        lambda x: tokenizer(x["lv_text"], truncation=True, max_length=max_length),
         batched=True,
     ).map(
         lambda x: {
