@@ -103,6 +103,7 @@ def main(cfg: DictConfig):
             test_dataloader=test_dataloader,
             labels=cfg.dataset.labels,
             problem_type=cfg.trainer.problem_type,
+            trained_model_name=cfg.trained_model_name,
         )
         print("Evaluation results:", results)
 

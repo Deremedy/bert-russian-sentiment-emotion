@@ -1,9 +1,30 @@
 from src.trainer.metrics import calculate_metrics, calculate_f1_score_old
 from src.trainer.predict import predict
 import pandas as pd
+import os
 
 
-def eval(model, test_dataloader, labels, problem_type, return_debug=False):
+def get_unique_filename(base_filename, directory="model_evaluation_runs"):
+    """
+    Generates a unique filename by appending a counter to the base filename
+    if a file with the same name already exists in the specified directory.
+    """
+    # Ensure the directory exists
+    os.makedirs(directory, exist_ok=True)
+
+    # Prepare initial filename
+    full_path = os.path.join(directory, f"{base_filename}.csv")
+    counter = 1
+
+    # If the file exists, find a unique name by appending a counter
+    while os.path.exists(full_path):
+        full_path = os.path.join(directory, f"{base_filename}_{counter}.csv")
+        counter += 1
+
+    return full_path
+
+
+def eval(model, test_dataloader, labels, problem_type, return_debug=False, trained_model_name=None):
     model.eval()
 
     test_y_true, test_y_pred, test_loss = predict(model, test_dataloader, problem_type)
@@ -21,7 +42,8 @@ def eval(model, test_dataloader, labels, problem_type, return_debug=False):
     df = df.round(2)
 
     print(df)
-    df.to_csv("runs/last_run.csv")
+    run_report_filepath = get_unique_filename(f"{trained_model_name}")
+    df.to_csv(run_report_filepath)
 
     if return_debug:
         return test_y_true, test_y_pred, df
