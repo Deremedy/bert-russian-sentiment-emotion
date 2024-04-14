@@ -10,6 +10,7 @@ from src.utils.utils import save_model, push_to_hub
 import random
 import numpy as np
 import torch
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 # turn off bert warnings
 os.environ["TRANSFORMERS_NO_ADVISORY_WARNINGS"] = "true"
@@ -80,25 +81,30 @@ def main(cfg: DictConfig):
         # )
 
     elif cfg.task == "eval":
-        tokenizer, model = get_model(
-            f"seara/{cfg.model.name}-{cfg.dataset.name}",
-            cfg.dataset.labels,
-            cfg.dataset.num_labels,
-            cfg.trainer.problem_type,
-            cfg.task,
-        )
+        def load_model(tokenizer_dir, model_dir):
+            tokenizer = AutoTokenizer.from_pretrained(tokenizer_dir)
+            model = AutoModelForSequenceClassification.from_pretrained(model_dir)
+            return tokenizer, model
 
+        # Path to the saved model directory
+        saved_model_dir = f"model_checkpoints/{cfg.trained_model_name}"
+
+        # Load model and tokenizer from the saved directory
+        tokenizer, model = load_model(saved_model_dir, saved_model_dir)
+
+        # Assuming you have a function to prepare data loaders
         train_dataloader, val_dataloader, test_dataloader = call(
             cfg.dataset.dataloader, tokenizer=tokenizer
         )
 
-        eval(
+        # Assuming you have a function to evaluate the model
+        results = eval(
             model=model,
             test_dataloader=test_dataloader,
             labels=cfg.dataset.labels,
             problem_type=cfg.trainer.problem_type,
         )
-
+        print("Evaluation results:", results)
 
 if __name__ == "__main__":
     main()

@@ -10,4 +10,5 @@ project_name: "VKR"
 log_wandb: False
 
 task: eval
+trained_model_name: test
 # task: train
