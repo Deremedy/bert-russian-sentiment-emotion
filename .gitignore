@@ -136,3 +136,6 @@ wandb/
 
 # Ignore model checkpoints
 model_checkpoints/
+
+# Ignore .idea folder
+.idea/
