@@ -1,4 +1,4 @@
-name: lv-go-emotions-ekman
+name: ru-go-emotions-ekman
 num_labels: 7
 labels:
   0: anger
@@ -10,7 +10,7 @@ labels:
   6: neutral
 
 dataloader:
-  _target_: src.data.lv_go_emotions_ekman.get_dataloaders
+  _target_: src.data.ru_go_emotions_ekman.get_dataloaders
   max_length: ${trainer.max_length}
   batch_size: ${trainer.batch_size}
   shuffle: ${trainer.shuffle}
