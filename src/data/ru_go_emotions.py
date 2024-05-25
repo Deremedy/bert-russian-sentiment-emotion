@@ -16,7 +16,7 @@ def preprocess(tokenizer, max_length):
             "label": [float(y) for y in binarize_labels(x["labels"], num_labels)]
         },
         batched=False,
-        remove_columns=["text", "labels", "id", "text"],
+        remove_columns=["text", "labels", "id", "ru_text"],
     )
 
     return processed_dataset
