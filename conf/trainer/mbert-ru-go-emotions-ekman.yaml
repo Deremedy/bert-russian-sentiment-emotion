@@ -10,4 +10,4 @@ weight_decay: 0
 
 problem_type: multi_label_classification
 
-num_epochs: 5
+num_epochs: 10
