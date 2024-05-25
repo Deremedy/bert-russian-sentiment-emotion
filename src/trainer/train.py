@@ -44,13 +44,14 @@ def train(
 
         # Save model and tokenizer using Hugging Face's `save_pretrained`
         filename = f"{model_name}-{dataset_name}-epoch_{epoch + 1}-val_loss_{val_loss:.4f}"
-        model_directory = os.path.join(
-            checkpoint_path,
-            filename
-        )
-        os.makedirs(model_directory, exist_ok=True)
-        model.save_pretrained(model_directory)
-        tokenizer.save_pretrained(model_directory)
+        # TODO: remove disabled saving
+        # model_directory = os.path.join(
+        #     checkpoint_path,
+        #     filename
+        # )
+        # os.makedirs(model_directory, exist_ok=True)
+        # model.save_pretrained(model_directory)
+        # tokenizer.save_pretrained(model_directory)
 
         # Evaluate the model
         test_y_true, test_y_pred, test_loss = predict(model, test_dataloader, problem_type)
@@ -59,7 +60,7 @@ def train(
         # Save evaluation results to the same directory as the model
         df = pd.DataFrame(report_dict).round(2)
         print(df)
-        evaluation_filepath = os.path.join(model_directory, "_evaluation_results.csv")
+        evaluation_filepath = os.path.join(checkpoint_path, filename + "_evaluation_results.csv")
         df.to_csv(evaluation_filepath)
 
     # Evaluate the model after all epochs are completed
