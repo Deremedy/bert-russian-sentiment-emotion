@@ -9,14 +9,14 @@ def preprocess(tokenizer, max_length):
     dataset = load_dataset("seara/ru_go_emotions", "simplified")
 
     processed_dataset = dataset.map(
-        lambda x: tokenizer(x["text"], truncation=True, max_length=max_length),
+        lambda x: tokenizer(x["ru_text"], truncation=True, max_length=max_length),
         batched=True,
     ).map(
         lambda x: {
             "label": [float(y) for y in binarize_labels(x["labels"], num_labels)]
         },
         batched=False,
-        remove_columns=["text", "labels", "id", "ru_text"],
+        remove_columns=["text", "labels", "id", "text"],
     )
 
     return processed_dataset

@@ -1,0 +1,2 @@
+encoder: google-bert/bert-base-multilingual-cased
+name: mbert
